@@ -17,7 +17,6 @@ public class Prestation {
 
     private String nom;
     private String description;
-    private Double prix;
     private String categorie;
     private String statut;
 
@@ -32,4 +31,16 @@ public class Prestation {
     @JsonIgnore
     @ManyToMany(mappedBy = "prestations")
     private List<Commande> commandes;
+
+    @OneToMany(mappedBy = "prestation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SousPrestation> sousPrestations;
+
+    @Transient
+    public Double getPrixTotal() {
+        if (sousPrestations == null) return 0.0;
+
+        return sousPrestations.stream()
+                .mapToDouble(SousPrestation::getPrix)
+                .sum();
+    }
 }

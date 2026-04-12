@@ -1,21 +1,19 @@
 package com.eventmanager.dto;
 
 import lombok.Data;
+import java.util.List;
 
 @Data
 public class PrestationDTO {
 
-    private String id;
-
+    private Long id;
     private String nom;
-
     private String description;
-
-    private Double prix;
-
     private String categorie;
-
     private String statut;
 
     private String proprietaireId;
+
+    private List<SousPrestationDTO> sousPrestations;
+    private Double prixTotal;
 }

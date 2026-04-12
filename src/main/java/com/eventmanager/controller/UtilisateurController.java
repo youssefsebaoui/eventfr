@@ -27,7 +27,7 @@ public class UtilisateurController {
                         String.valueOf(u.getId()),
                         u.getNom(),
                         u.getEmail(),
-                        u.getTelephone(), // ✅ IMPORTANT
+                        u.getTelephone(),
                         u.getRole()
                 )
         );

@@ -70,30 +70,88 @@ public class MapperService {
     }
 
     // --------------------- PRESTATION ---------------------
+
     public PrestationDTO toDto(Prestation s) {
+
         PrestationDTO d = new PrestationDTO();
-        d.setId(String.valueOf(s.getId()));
+
+        d.setId(s.getId());
         d.setNom(s.getNom());
         d.setDescription(s.getDescription());
-        d.setPrix(s.getPrix());
         d.setCategorie(s.getCategorie());
         d.setStatut(s.getStatut());
-        d.setProprietaireId(s.getProprietaire() != null ? String.valueOf(s.getProprietaire().getId()) : "");
+
+        d.setProprietaireId(
+                s.getProprietaire() != null ? String.valueOf(s.getProprietaire().getId()) : ""
+        );
+
+        // Sous prestations
+        d.setSousPrestations(
+                s.getSousPrestations() != null
+                        ? s.getSousPrestations().stream().map(this::toSousDto).collect(Collectors.toList())
+                        : new ArrayList<>()
+        );
+
+        // Prix total automatique
+        d.setPrixTotal(
+                s.getSousPrestations() != null
+                        ? s.getSousPrestations().stream().mapToDouble(SousPrestation::getPrix).sum()
+                        : 0.0
+        );
+
         return d;
     }
 
     public Prestation fromDto(PrestationDTO d, Utilisateur proprietaire) {
+
         Prestation s = new Prestation();
+
         s.setNom(d.getNom());
         s.setDescription(d.getDescription());
-        s.setPrix(d.getPrix());
         s.setCategorie(d.getCategorie());
         s.setStatut(d.getStatut() != null ? d.getStatut() : "actif");
+
         s.setProprietaire(proprietaire);
+
+        if (d.getSousPrestations() != null) {
+
+            List<SousPrestation> list = d.getSousPrestations()
+                    .stream()
+                    .map(this::toSousEntity)
+                    .collect(Collectors.toList());
+
+            s.setSousPrestations(list);
+        }
+
         return s;
     }
 
+    // --------------------- SOUS PRESTATION ---------------------
+
+    public SousPrestation toSousEntity(SousPrestationDTO dto) {
+
+        SousPrestation sp = new SousPrestation();
+
+        sp.setId(dto.getId());
+        sp.setNom(dto.getNom());
+        sp.setPrix(dto.getPrix());
+
+        return sp;
+    }
+
+    public SousPrestationDTO toSousDto(SousPrestation sp) {
+
+        SousPrestationDTO dto = new SousPrestationDTO();
+
+        dto.setId(sp.getId());
+        dto.setNom(sp.getNom());
+        dto.setPrix(sp.getPrix());
+
+        return dto;
+    }
+
     // --------------------- PACK ---------------------
+
     public PackDTO toDto(Pack p) {
         PackDTO d = new PackDTO();
         d.setId(String.valueOf(p.getId()));
@@ -122,6 +180,7 @@ public class MapperService {
     }
 
     // --------------------- COMMANDE ---------------------
+
     public CommandeDTO toDto(Commande o) {
         CommandeDTO d = new CommandeDTO();
         d.setId(String.valueOf(o.getId()));
@@ -168,6 +227,7 @@ public class MapperService {
     }
 
     // --------------------- PRESTATAIRE ---------------------
+
     public PrestataireDTO toPrestataire(Utilisateur u, String proprietaireId) {
         PrestataireDTO d = new PrestataireDTO();
         d.setId(String.valueOf(u.getId()));
