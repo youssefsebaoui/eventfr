@@ -18,13 +18,14 @@ public class PrestationService {
     private final MapperService mapper;
 
     public PrestationService(PrestationRepository r, UtilisateurRepository u, MapperService m) {
-        repo = r;
-        uRepo = u;
-        mapper = m;
+        this.repo = r;
+        this.uRepo = u;
+        this.mapper = m;
     }
 
     public List<PrestationDTO> findAll(String email) {
         Utilisateur u = uRepo.findByEmail(email).orElseThrow();
+
         return repo.findByProprietaireId(u.getId())
                 .stream()
                 .map(mapper::toDto)
@@ -40,17 +41,45 @@ public class PrestationService {
 
     public PrestationDTO create(PrestationDTO dto, String email) {
         Utilisateur u = uRepo.findByEmail(email).orElseThrow();
-        Prestation p = mapper.fromDto(dto, u); // mapper doit créer la prestation avec propriétaire
+
+        Prestation p = mapper.fromDto(dto, u);
+
+        // IMPORTANT: lien sous-prestations
+        if (p.getSousPrestations() != null) {
+            p.getSousPrestations().forEach(sp -> sp.setPrestation(p));
+        }
+
         return mapper.toDto(repo.save(p));
     }
 
     public PrestationDTO update(Long id, PrestationDTO dto) {
+
         Prestation p = repo.findById(id).orElseThrow();
+
         p.setNom(dto.getNom());
         p.setDescription(dto.getDescription());
-        p.setPrix(dto.getPrix());
         p.setCategorie(dto.getCategorie());
         p.setStatut(dto.getStatut());
+
+        // remove old children safely
+        if (p.getSousPrestations() != null) {
+            p.getSousPrestations().forEach(sp -> sp.setPrestation(null));
+            p.getSousPrestations().clear();
+        } else {
+            p.setSousPrestations(new java.util.ArrayList<>());
+        }
+
+        // add new children
+        if (dto.getSousPrestations() != null) {
+            for (var spDto : dto.getSousPrestations()) {
+
+                var sp = mapper.toSousEntity(spDto);
+                sp.setPrestation(p);
+
+                p.getSousPrestations().add(sp);
+            }
+        }
+
         return mapper.toDto(repo.save(p));
     }
 

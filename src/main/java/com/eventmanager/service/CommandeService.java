@@ -84,7 +84,7 @@ public class CommandeService {
         if (o.getPrestations() != null) {
             total += o.getPrestations()
                     .stream()
-                    .mapToDouble(Prestation::getPrix)
+                    .mapToDouble(Prestation::getPrixTotal)
                     .sum();
         }
 
@@ -136,7 +136,7 @@ public class CommandeService {
         double total = 0;
 
         if (o.getPrestations() != null) {
-            total += o.getPrestations().stream().mapToDouble(Prestation::getPrix).sum();
+            total += o.getPrestations().stream().mapToDouble(Prestation::getPrixTotal).sum();
         }
 
         if (o.getPacks() != null) {
