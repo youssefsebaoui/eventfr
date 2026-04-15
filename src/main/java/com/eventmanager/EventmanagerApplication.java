@@ -31,18 +31,6 @@ public class EventmanagerApplication {
 				u.setTelephone("+212600000000");
 				repo.save(u);
 			}
-
 		};
 	}
-	/*@Bean
-	CommandLineRunner init(TypeEvenementRepository repo) {
-		return args -> {
-			if (repo.count() == 0) {
-				repo.save(TypeEvenement.builder().libelle("MARIAGE").build());
-				repo.save(TypeEvenement.builder().libelle("BAPTEME").build());
-				repo.save(TypeEvenement.builder().libelle("SEMINAIRE").build());
-				repo.save(TypeEvenement.builder().libelle("ANNIVERSAIRE").build());
-			}
-		};
-	}*/
 }

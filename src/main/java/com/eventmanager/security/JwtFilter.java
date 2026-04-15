@@ -13,7 +13,6 @@ import java.io.IOException;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwt;
-
     private final UserDetailsService uds;
 
     public JwtFilter(JwtUtil j, UserDetailsService u) {

@@ -39,8 +39,6 @@ public class Evenement {
 
     private Double budget;
 
-
-
     @ManyToOne
     @JoinColumn(name = "proprietaire_id")
     private Utilisateur proprietaire;
