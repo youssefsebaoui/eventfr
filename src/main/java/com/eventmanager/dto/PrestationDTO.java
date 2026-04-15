@@ -4,18 +4,14 @@ import lombok.Data;
 
 @Data
 public class PrestationDTO {
-
-    private Long id;
-
+    private String id;
     private String nom;
-
     private String description;
-
-    private Double prix;
-
-    private Long categorieId;
-
+    private double prix;
     private String statut;
 
-    private Long proprietaireId;
+    private Long categorieId;
+    private String categorieNom;
+
+    private String proprietaireId;
 }

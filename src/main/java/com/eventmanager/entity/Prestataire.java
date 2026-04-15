@@ -7,8 +7,7 @@ import java.util.List;
 
 @Data
 @Entity
-public class Societe {
-
+public class Prestataire {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,6 +19,6 @@ public class Societe {
 
     private String telephone;
 
-    @OneToMany(mappedBy = "societe")
+    @OneToMany(mappedBy = "prestataire")
     private List<Utilisateur> utilisateurs;
 }
