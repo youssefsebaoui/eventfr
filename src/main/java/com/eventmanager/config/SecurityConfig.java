@@ -22,8 +22,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain chain(HttpSecurity http) throws Exception {
-        return http.csrf(c -> c.disable())
-                .cors(cors -> {}) // ✅ IMPORTANT
+        return http.csrf(c -> c.disable()).cors(c -> c.configure(http))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a -> a.requestMatchers("/api/auth/**", "/h2-console/**").permitAll().anyRequest().authenticated())
                 .headers(h -> h.frameOptions(f -> f.disable()))

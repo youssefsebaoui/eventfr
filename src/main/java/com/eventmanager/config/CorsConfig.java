@@ -12,8 +12,7 @@ public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration c = new CorsConfiguration();
-        //c.setAllowedOriginPatterns(List.of("*"));
-        c.setAllowedOrigins(List.of("https://tubular-cajeta-6628b8.netlify.app"));
+        c.setAllowedOriginPatterns(List.of("*"));
         c.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         c.setAllowedHeaders(List.of("*"));
         c.setAllowCredentials(true);
