@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class PrestationDTO {
 
-    private String id;
+    private Long id;
 
     private String nom;
 
@@ -13,9 +13,9 @@ public class PrestationDTO {
 
     private Double prix;
 
-    private String categorie;
+    private Long categorieId;
 
     private String statut;
 
-    private String proprietaireId;
+    private Long proprietaireId;
 }
