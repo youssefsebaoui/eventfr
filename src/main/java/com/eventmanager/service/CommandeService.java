@@ -1,6 +1,7 @@
 package com.eventmanager.service;
 
 import com.eventmanager.dto.CommandeDTO;
+import com.eventmanager.dto.CommandePrestationDTO;
 import com.eventmanager.entity.*;
 import com.eventmanager.repository.*;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class CommandeService {
@@ -18,6 +20,9 @@ public class CommandeService {
     private final PrestationRepository prestationRepo;
     private final PackRepository packRepo;
     private final MapperService mapper;
+    private final SousServiceRepository sousServiceRepo;
+
+    private final CommandePrestationRepository commandePrestationRepository;
 
     public CommandeService(
             CommandeRepository r,
@@ -25,7 +30,7 @@ public class CommandeService {
             EvenementRepository e,
             PrestationRepository p,
             PackRepository packR,
-            MapperService m
+            MapperService m, SousServiceRepository sousServiceRepo, CommandePrestationRepository commandePrestationRepository
     ) {
         repo = r;
         uRepo = u;
@@ -33,6 +38,8 @@ public class CommandeService {
         prestationRepo = p;
         packRepo = packR;
         mapper = m;
+        this.sousServiceRepo = sousServiceRepo;
+        this.commandePrestationRepository = commandePrestationRepository;
     }
 
     public List<CommandeDTO> findAll(String email) {
@@ -101,7 +108,6 @@ public class CommandeService {
     }
 
     public CommandeDTO update(Long id, CommandeDTO dto) {
-
         Commande o = repo.findById(id).orElseThrow();
 
         o.setTitre(dto.getTitre());
@@ -110,9 +116,7 @@ public class CommandeService {
         o.setNotes(dto.getNotes());
 
         if (dto.getEvenementId() != null && !dto.getEvenementId().isEmpty()) {
-            o.setEvenement(
-                    eRepo.findById(Long.valueOf(dto.getEvenementId())).orElse(null)
-            );
+            o.setEvenement(eRepo.findById(Long.valueOf(dto.getEvenementId())).orElse(null));
         }
 
         if (dto.getPrestationIds() != null) {
@@ -122,6 +126,25 @@ public class CommandeService {
                             .collect(Collectors.toList())
             );
             o.setPrestations(prestations);
+
+            if (dto.getPrestationsWithQuantite() != null && !dto.getPrestationsWithQuantite().isEmpty()) {
+                for (CommandePrestationDTO p : dto.getPrestationsWithQuantite()) {
+                    CommandePrestation cp = new CommandePrestation();
+                    cp.setCommandeId(o.getId());
+                    cp.setPrestationId(Long.valueOf(p.getPrestationId()));
+                    cp.setQuantite(p.getQuantite());
+                    commandePrestationRepository.save(cp);
+                }
+            }
+            // Sauvegarder quantities
+            if (dto.getQuantities() != null) {
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    o.setQuantities(objectMapper.writeValueAsString(dto.getQuantities()));
+                } catch (Exception e) {
+                    o.setQuantities(null);
+                }
+            }
         }
 
         if (dto.getPackIds() != null) {
@@ -133,17 +156,41 @@ public class CommandeService {
             o.setPacks(packs);
         }
 
-        double total = 0;
-
-        if (o.getPrestations() != null) {
-            total += o.getPrestations().stream().mapToDouble(Prestation::getPrix).sum();
+        // ← Sauvegarder sousServices
+        if (dto.getSousServiceIds() != null) {
+            List<SousService> sousServices = sousServiceRepo.findAllById(dto.getSousServiceIds());
+            o.setSousServices(sousServices);
         }
 
-        if (o.getPacks() != null) {
-            total += o.getPacks().stream().mapToDouble(Pack::getPrix).sum();
+        // ← Sauvegarder pricingType en JSON string
+        if (dto.getPricingType() != null) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                o.setPricingType(objectMapper.writeValueAsString(dto.getPricingType()));
+            } catch (Exception e) {
+                o.setPricingType(null);
+            }
         }
 
-        o.setPrixTotal(total);
+        // ← Utiliser prixTotal du frontend
+        if (dto.getPrixTotal() != null && dto.getPrixTotal() > 0) {
+            o.setPrixTotal(dto.getPrixTotal());
+        }
+        // ← Sauvegarder le prestataire
+        if (dto.getPrestataireId() != null && !dto.getPrestataireId().isEmpty()) {
+            Utilisateur prestataire = uRepo.findById(Long.valueOf(dto.getPrestataireId())).orElse(null);
+            o.setPrestataire(prestataire);
+        } else {
+            o.setPrestataire(null);
+        }
+        if (dto.getPrestataireIds() != null && !dto.getPrestataireIds().isEmpty()) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                o.setPrestataireIds(objectMapper.writeValueAsString(dto.getPrestataireIds()));
+            } catch (Exception e) {
+                o.setPrestataireIds(null);
+            }
+        }
 
         return mapper.toDto(repo.save(o));
     }
