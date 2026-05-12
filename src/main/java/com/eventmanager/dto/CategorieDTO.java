@@ -7,6 +7,10 @@ public class CategorieDTO {
     private String description;
     private Long proprietaireId;
 
+    // ✅ Ajouter ces deux champs
+    private Long typeEvenementId;
+    private String typeEvenementLibelle;
+
     public Long getId() {
         return id;
     }
@@ -37,5 +41,21 @@ public class CategorieDTO {
 
     public void setProprietaireId(Long proprietaireId) {
         this.proprietaireId = proprietaireId;
+    }
+
+    public Long getTypeEvenementId() {
+        return typeEvenementId;
+    }
+
+    public void setTypeEvenementId(Long typeEvenementId) {
+        this.typeEvenementId = typeEvenementId;
+    }
+
+    public String getTypeEvenementLibelle() {
+        return typeEvenementLibelle;
+    }
+
+    public void setTypeEvenementLibelle(String typeEvenementLibelle) {
+        this.typeEvenementLibelle = typeEvenementLibelle;
     }
 }

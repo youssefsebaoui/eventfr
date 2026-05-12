@@ -19,6 +19,11 @@ public class Categorie{
     @OneToMany(mappedBy = "categorie", cascade = CascadeType.ALL)
     private List<Prestation> services = new ArrayList<>();
 
+    @ManyToOne
+    @JoinColumn(name = "type_evenement_id")
+    private TypeEvenement typeEvenement;
+
+
     public Long getId() {
         return id;
     }
@@ -57,5 +62,13 @@ public class Categorie{
 
     public void setServices(List<Prestation> services) {
         this.services = services;
+    }
+
+    public TypeEvenement getTypeEvenement() {
+        return typeEvenement;
+    }
+
+    public void setTypeEvenement(TypeEvenement typeEvenement) {
+        this.typeEvenement = typeEvenement;
     }
 }
